@@ -13,7 +13,7 @@ const LoginForm = ({ onLoginSuccess }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/check-auth", {
+      const response = await fetch("/api/auth", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -24,7 +24,6 @@ const LoginForm = ({ onLoginSuccess }) => {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem("isLoggedIn", "true");
         showToast("Login successful", "success");
         onLoginSuccess?.();
       } else {

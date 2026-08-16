@@ -136,26 +136,18 @@ const Dashboard = () => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const storedIsLoggedIn = localStorage.getItem("isLoggedIn");
-      if (storedIsLoggedIn === "true") {
-        setIsAuthenticated(true);
-        fetchProjects();
-        fetchImages();
-      } else {
-        try {
-          const response = await fetch("/api/check-auth");
-          if (response.ok) {
-            setIsAuthenticated(true);
-            localStorage.setItem("isLoggedIn", "true");
-            fetchProjects();
-            fetchImages();
-          } else {
-            setIsAuthenticated(false);
-          }
-        } catch (error) {
-          console.error("Error checking authentication:", error);
-          showToast("An error occurred while checking authentication", "error");
+      try {
+        const response = await fetch("/api/check-auth");
+        if (response.ok) {
+          setIsAuthenticated(true);
+          fetchProjects();
+          fetchImages();
+        } else {
+          setIsAuthenticated(false);
         }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+        showToast("An error occurred while checking authentication", "error");
       }
       setIsLoading(false);
     };
@@ -169,9 +161,13 @@ const Dashboard = () => {
     fetchImages();
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth", { method: "DELETE" });
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
     setIsAuthenticated(false);
-    localStorage.removeItem("isLoggedIn");
     showToast("Logged out successfully", "success");
   };
 
@@ -368,6 +364,7 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
               <Panel title={editingProject ? "Edit project" : "Add project"}>
                 <AddProjectCard
+                  key={editingProject?._id || "new-project"}
                   onProjectSubmit={handleProjectSubmit}
                   editingProject={editingProject}
                   setEditingProject={setEditingProject}
@@ -405,6 +402,7 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
               <Panel title={editingImage ? "Edit image" : "Add image"}>
                 <CarouselForm
+                  key={editingImage?._id || "new-image"}
                   onImageAdded={fetchImages}
                   images={images}
                   editingImage={editingImage}

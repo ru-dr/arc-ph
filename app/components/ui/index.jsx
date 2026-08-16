@@ -10,6 +10,7 @@ import React, {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
+import { useIsClient } from "../../hooks/useIsClient";
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 
 const cx = (...parts) => parts.filter(Boolean).join(" ");
@@ -395,28 +396,10 @@ export const useDisclosure = () => {
 
 const ModalContext = createContext({ onClose: () => {} });
 
-const MODAL_EXIT_MS = 140;
-
 export const Modal = ({ isOpen, onOpenChange, children, className }) => {
-  const [mounted, setMounted] = useState(false);
-
-  const [present, setPresent] = useState(isOpen);
-  const [entered, setEntered] = useState(false);
+  const isClient = useIsClient();
   const panelRef = useRef(null);
   const onClose = useCallback(() => onOpenChange?.(false), [onOpenChange]);
-
-  useEffect(() => setMounted(true), []);
-
-  useEffect(() => {
-    if (isOpen) {
-      setPresent(true);
-      const raf = requestAnimationFrame(() => setEntered(true));
-      return () => cancelAnimationFrame(raf);
-    }
-    setEntered(false);
-    const timer = setTimeout(() => setPresent(false), MODAL_EXIT_MS);
-    return () => clearTimeout(timer);
-  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -431,34 +414,17 @@ export const Modal = ({ isOpen, onOpenChange, children, className }) => {
     };
   }, [isOpen, onClose]);
 
-  if (!mounted || !present) return null;
+  if (!isClient) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-      <div
-        className={cx(
-          "absolute inset-0 bg-[rgba(22,21,15,0.45)]",
-          "transition-opacity duration-[180ms] ease-[cubic-bezier(0.23,1,0.32,1)]",
-          entered ? "opacity-100" : "opacity-0"
-        )}
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
+    <div className="modal-layer" data-open={isOpen ? "true" : "false"}>
+      <div className="modal-backdrop" onClick={onClose} aria-hidden="true" />
       <div
         ref={panelRef}
         role="dialog"
         aria-modal="true"
         tabIndex={-1}
-        className={cx(
-          "relative w-full max-w-md border border-[var(--rule)] bg-[var(--paper)]",
-          "shadow-[0_24px_60px_-24px_rgba(22,21,15,0.55)] outline-none",
-          "transition-[opacity,transform] ease-[cubic-bezier(0.23,1,0.32,1)]",
-          entered
-            ? "opacity-100 scale-100 translate-y-0 duration-200"
-            : "opacity-0 scale-[0.96] translate-y-1.5 duration-[140ms]",
-          className
-        )}
+        className={cx("modal-panel", className)}
       >
         <ModalContext.Provider value={{ onClose }}>{children}</ModalContext.Provider>
       </div>

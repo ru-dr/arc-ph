@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   Modal,
   ModalContent,
@@ -18,24 +18,17 @@ const ProjectList = ({ projects, onProjectUpdated, setEditingProject }) => {
   const [projectToDelete, setProjectToDelete] = useState(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProjects, setFilteredProjects] = useState(projects);
-  const [isEditMode, setIsEditMode] = useState(false);
 
   const showToast = useToast();
 
-  useEffect(() => {
-    if (!projects) return;
-
-    const results = projects.filter((project) =>
-      project.projectName.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredProjects(results);
-  }, [searchTerm, projects]);
-
   const currentFilteredProjects = useMemo(() => {
-    if (!filteredProjects) return [];
-    return filteredProjects;
-  }, [filteredProjects]);
+    if (!projects) return [];
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return projects;
+    return projects.filter((project) =>
+      project.projectName.toLowerCase().includes(term)
+    );
+  }, [projects, searchTerm]);
 
   const handleDeleteClick = (project) => {
     setProjectToDelete(project);
@@ -114,7 +107,6 @@ const ProjectList = ({ projects, onProjectUpdated, setEditingProject }) => {
           onEdit={setEditingProject}
           onDelete={handleDeleteClick}
           deletingId={deletingId}
-          isEditMode={isEditMode}
         />
       </div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} className="inter">

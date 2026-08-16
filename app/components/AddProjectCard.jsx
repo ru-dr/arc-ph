@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Image, Tooltip } from "./ui";
 import { useToast } from "../hooks/useToast";
 import ProjectFormInputs from "./ProjectFormInputs";
@@ -11,31 +11,24 @@ const AddProjectCard = ({
   setEditingProject,
   projects = [],
 }) => {
-  const [formData, setFormData] = useState({
-    projectName: "",
-    collectionUrl: "",
-    coverImage: "",
-    fullWidth: false,
-    order: 1
+  const [formData, setFormData] = useState(() => {
+    if (editingProject) return editingProject;
+    const maxOrder =
+      projects.length > 0
+        ? Math.max(...projects.map((proj) => proj.order || 0))
+        : 0;
+    return {
+      projectName: "",
+      collectionUrl: "",
+      coverImage: "",
+      fullWidth: false,
+      order: maxOrder + 1,
+    };
   });
   const [isLoading, setIsLoading] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(null);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const showToast = useToast();
-
-  useEffect(() => {
-    if (editingProject) {
-      setFormData(editingProject);
-    } else {
-      const maxOrder = projects.length > 0
-        ? Math.max(...projects.map(proj => proj.order || 0))
-        : 0;
-      setFormData(prev => ({
-        ...prev,
-        order: maxOrder + 1
-      }));
-    }
-  }, [editingProject, projects]);
 
   const handleChange = (name, value) => {
     setFormData((prev) => ({ ...prev, [name]: value }));

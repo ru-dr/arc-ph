@@ -1,17 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useMediaQuery } from "../../hooks/useIsClient";
 
 export const EASE_OUT = [0.23, 1, 0.32, 1];
 
 export const useMotionSettings = () => {
-  const prefersReduced = useReducedMotion();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
-
-  const reduced = mounted ? Boolean(prefersReduced) : false;
+  const reduced = useMediaQuery("(prefers-reduced-motion: reduce)");
 
   return {
     reduced,

@@ -1,11 +1,12 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { z } from "zod";
 import Image from "next/image";
 import Link from "next/link";
 import { Button, Checkbox, Spinner } from "../components/ui";
 import FormField from "../components/FormField";
 import { useToast } from "../hooks/useToast";
+import { useIsClient } from "../hooks/useIsClient";
 const schema = z.object({
   name: z.string().nonempty("Name is required"),
   ownerName: z.string().optional(),
@@ -38,12 +39,8 @@ export default function FormPage() {
 
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isClient, setIsClient] = useState(false);
   const showToast = useToast();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  const isClient = useIsClient();
 
   const handleChange = useCallback((e) => {
     const { name, value, type, checked } = e.target;

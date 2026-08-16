@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import {
   Modal,
   ModalContent,
@@ -18,24 +18,19 @@ const CarouselManager = ({ images, onImagesUpdated, onEdit }) => {
   const [imageToDelete, setImageToDelete] = useState(null);
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredImages, setFilteredImages] = useState(images);
 
   const showToast = useToast();
 
-  useEffect(() => {
-    if (!images) return;
-
-    const results = images.filter((image) =>
-      image.info?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      image.title?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredImages(results);
-  }, [searchTerm, images]);
-
   const currentFilteredImages = useMemo(() => {
-    if (!filteredImages) return [];
-    return filteredImages;
-  }, [filteredImages]);
+    if (!images) return [];
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return images;
+    return images.filter(
+      (image) =>
+        image.info?.toLowerCase().includes(term) ||
+        image.title?.toLowerCase().includes(term)
+    );
+  }, [images, searchTerm]);
 
   const handleDeleteClick = (image) => {
     setImageToDelete(image);

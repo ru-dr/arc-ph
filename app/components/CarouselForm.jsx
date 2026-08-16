@@ -1,43 +1,22 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input, Button, Image, Tooltip } from "./ui";
 import { Plus, Info } from "lucide-react";
 import { useToast } from "../hooks/useToast";
 
+const nextAvailableOrder = (images) =>
+  images.length > 0 ? Math.max(...images.map((img) => img.order || 0)) + 1 : 1;
+
 const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditingImage }) => {
-  const [formData, setFormData] = useState({
-    url: "",
-    info: "",
-    number: "",
-    order: 1
+  const [formData, setFormData] = useState(() => {
+    if (editingImage) return editingImage;
+    const order = nextAvailableOrder(images);
+    return { url: "", info: "", number: String(order).padStart(3, "0"), order };
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const showToast = useToast();
 
-  useEffect(() => {
-    if (editingImage) {
-      setFormData(editingImage);
-    } else {
-      const maxOrder = images.length > 0
-        ? Math.max(...images.map(img => img.order || 0))
-        : 0;
-      const nextOrder = maxOrder + 1;
-      const paddedNumber = String(nextOrder).padStart(3, '0');
-      setFormData(prev => ({
-        ...prev,
-        order: nextOrder,
-        number: paddedNumber
-      }));
-    }
-  }, [editingImage, images]);
-
-  useEffect(() => {
-    const paddedNumber = String(formData.order).padStart(3, '0');
-    setFormData(prev => ({
-      ...prev,
-      number: paddedNumber
-    }));
-  }, [formData.order]);
+  const displayNumber = String(formData.order || 1).padStart(3, "0");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -83,7 +62,7 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
       const submitData = {
         ...formData,
         order: newOrder,
-        number: String(newOrder).padStart(3, '0')
+        number: String(newOrder).padStart(3, "0"),
       };
 
       const url = editingImage ? `/api/carousel/${editingImage._id}` : "/api/carousel";
@@ -101,7 +80,13 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
       }
 
       showToast(`Image ${editingImage ? 'updated' : 'added'} successfully`, "success");
-      setFormData({ url: "", info: "", number: "", order: 1 });
+      const resetOrder = nextAvailableOrder(images);
+      setFormData({
+        url: "",
+        info: "",
+        number: String(resetOrder).padStart(3, "0"),
+        order: resetOrder,
+      });
       setEditingImage(null);
       onImageAdded();
     } catch (error) {
@@ -193,7 +178,7 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
         />
         <Input
           label="Number"
-          value={formData.number}
+          value={displayNumber}
           disabled
           variant="bordered"
           helperText="Generated from the display order"

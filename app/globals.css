@@ -207,14 +207,60 @@ body {
   scroll-margin-top: 5.5rem;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
+.modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  transition: display 180ms allow-discrete;
 }
 
-@keyframes modalIn {
-  from {
+.modal-layer[data-open="false"] {
+  display: none;
+  pointer-events: none;
+}
+
+.modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(22, 21, 15, 0.45);
+  opacity: 1;
+  transition: opacity 180ms var(--ease-out), display 180ms allow-discrete;
+}
+
+.modal-panel {
+  position: relative;
+  width: 100%;
+  max-width: 28rem;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  box-shadow: 0 24px 60px -24px rgba(22, 21, 15, 0.55);
+  outline: none;
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: opacity 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+
+.modal-layer[data-open="false"] .modal-backdrop {
+  opacity: 0;
+  transition-duration: 140ms;
+}
+
+.modal-layer[data-open="false"] .modal-panel {
+  opacity: 0;
+  transform: scale(0.96) translateY(6px);
+  transition-duration: 140ms;
+}
+
+@starting-style {
+  .modal-layer[data-open="true"] .modal-backdrop {
+    opacity: 0;
+  }
+
+  .modal-layer[data-open="true"] .modal-panel {
     opacity: 0;
     transform: scale(0.96) translateY(6px);
   }
