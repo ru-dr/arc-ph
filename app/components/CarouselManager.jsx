@@ -8,7 +8,7 @@ import {
   useDisclosure,
   Input,
   Button,
-} from "@heroui/react";
+} from "./ui";
 import { Search } from "lucide-react";
 import { useToast } from "../hooks/useToast";
 import DraggableCarouselList from "./DraggableCarouselList";
@@ -92,13 +92,13 @@ const CarouselManager = ({ images, onImagesUpdated, onEdit }) => {
 
   return (
     <div className="flex flex-col h-full space-y-6">
-      <div className="sticky top-0 bg-white z-10">
+      <div className="sticky top-0 bg-paper z-10">
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <Input
               clearable
               contentLeft={<Search size={16} />}
-              placeholder="Search images..."
+              placeholder="Search images"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               variant="bordered"
@@ -122,12 +122,12 @@ const CarouselManager = ({ images, onImagesUpdated, onEdit }) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Confirm Deletion
+                Delete image?
               </ModalHeader>
               <ModalBody>
                 <p>
-                  Are you sure you want to delete this image? This action cannot be
-                  undone.
+                  This image will be removed from the home page carousel. This
+                  cannot be undone.
                 </p>
               </ModalBody>
               <ModalFooter>
@@ -135,7 +135,7 @@ const CarouselManager = ({ images, onImagesUpdated, onEdit }) => {
                   Cancel
                 </Button>
                 <Button color="danger" onPress={handleDelete}>
-                  Delete
+                  Delete image
                 </Button>
               </ModalFooter>
             </>

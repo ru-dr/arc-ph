@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Input, Button, Image, Tooltip } from "@heroui/react";
+import { Input, Button, Image, Tooltip } from "./ui";
 import { Plus, Info } from "lucide-react";
 import { useToast } from "../hooks/useToast";
 
@@ -14,13 +14,11 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
   const showToast = useToast();
 
-  // Set initial form data when editing or calculate next order
   useEffect(() => {
     if (editingImage) {
       setFormData(editingImage);
     } else {
-      // Find the highest order number
-      const maxOrder = images.length > 0 
+      const maxOrder = images.length > 0
         ? Math.max(...images.map(img => img.order || 0))
         : 0;
       const nextOrder = maxOrder + 1;
@@ -33,7 +31,6 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
     }
   }, [editingImage, images]);
 
-  // Update number when order changes
   useEffect(() => {
     const paddedNumber = String(formData.order).padStart(3, '0');
     setFormData(prev => ({
@@ -49,27 +46,21 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
     try {
       const newOrder = parseInt(formData.order);
       const oldOrder = editingImage?.order;
-      
-      // Get all images excluding the current one being edited
+
       const otherImages = images.filter(img => img._id !== editingImage?._id);
-      
-      // Reorder other images based on the new order
+
       const reorderedImages = otherImages.map(img => {
         if (editingImage) {
-          // When editing
           if (newOrder > oldOrder) {
-            // Moving down: decrease order of images between old and new position
             if (img.order > oldOrder && img.order <= newOrder) {
               return { ...img, order: img.order - 1 };
             }
           } else if (newOrder < oldOrder) {
-            // Moving up: increase order of images between new and old position
             if (img.order >= newOrder && img.order < oldOrder) {
               return { ...img, order: img.order + 1 };
             }
           }
         } else {
-          // When adding new: increase order of all images at or after the insertion point
           if (img.order >= newOrder) {
             return { ...img, order: img.order + 1 };
           }
@@ -77,7 +68,6 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
         return img;
       });
 
-      // First update other images if needed
       if (reorderedImages.some(img => img.order !== images.find(i => i._id === img._id)?.order)) {
         const reorderResponse = await fetch("/api/carousel/reorder", {
           method: "PUT",
@@ -90,7 +80,6 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
         }
       }
 
-      // Then add/update the current image
       const submitData = {
         ...formData,
         order: newOrder,
@@ -128,13 +117,12 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
   };
 
   const tooltipContent = (
-    <div className="p-3 sm:p-5 inter rounded-lg max-w-md">
-      <h3 className="text-emerald-800 font-semibold mb-2 sm:mb-4 text-base sm:text-lg">
-        Image Preview Notice
-      </h3>
-      <p className="text-emerald-700 text-sm sm:text-base">
-        This is a preview. The actual image will be displayed in full
-        orientation.
+    <div className="max-w-xs p-1 text-left">
+      <p className="mb-1 text-xs font-medium">
+        Preview only
+      </p>
+      <p className="text-[11px] text-[var(--ink-soft)]">
+        The published image keeps its full orientation.
       </p>
     </div>
   );
@@ -143,11 +131,11 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="w-full mb-6 relative">
         {formData.url ? (
-          <div className="relative h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden group">
+          <div className="group relative h-64 overflow-hidden border border-rule bg-paper-2 md:h-72">
             <Image
               src={formData.url}
               alt="Image Preview"
-              className="rounded-lg object-cover w-full h-full"
+              className="h-full w-full object-cover"
             />
             <Tooltip
               content={tooltipContent}
@@ -161,16 +149,16 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
                   e.preventDefault();
                   setIsTooltipOpen(!isTooltipOpen);
                 }}
-                className="absolute top-2 right-2 z-50 p-2 bg-emerald-200 rounded-full"
+                className="absolute right-3 top-3 z-30 inline-flex h-8 w-8 items-center justify-center border border-edge bg-paper/90 text-ink transition-colors duration-150 hover:border-ink"
                 aria-label="Image Preview Notice"
               >
-                <Info size={24} color="green" />
+                <Info size={14} />
               </button>
             </Tooltip>
           </div>
         ) : (
-          <div className="h-64 md:h-80 lg:h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-            <p className="text-gray-500 text-lg">No image preview</p>
+          <div className="flex h-64 items-center justify-center border border-dashed border-rule bg-paper-2 md:h-72">
+            <p className="text-sm text-ink-soft">Paste an image URL to preview it here</p>
           </div>
         )}
       </div>
@@ -178,8 +166,8 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
       <div className="space-y-4">
         <Input
           label="Image URL"
-          placeholder="Enter image URL"
-          value={formData.url}
+          placeholder="https://res.cloudinary.com/..."
+                    value={formData.url}
           onChange={(e) =>
             setFormData({ ...formData, url: e.target.value })
           }
@@ -189,7 +177,7 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
         <Input
           type="number"
           label="Display Order"
-          placeholder="Enter display order"
+          placeholder="1"
           value={formData.order}
           min={1}
           max={images.length + 1}
@@ -201,18 +189,18 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
           }}
           required
           variant="bordered"
-          helperText={`Enter a number between 1 and ${images.length + 1}`}
+          helperText={`1 to ${images.length + 1}`}
         />
         <Input
           label="Number"
           value={formData.number}
           disabled
           variant="bordered"
-          helperText="Auto-generated based on order (3 leading zeros)"
+          helperText="Generated from the display order"
         />
         <Input
           label="Info"
-          placeholder="Enter info text"
+          placeholder="Living room, Plympton"
           value={formData.info}
           onChange={(e) =>
             setFormData({ ...formData, info: e.target.value })
@@ -230,7 +218,7 @@ const CarouselForm = ({ onImageAdded, images = [], editingImage = null, setEditi
           className="flex-1"
           startContent={!editingImage && <Plus size={20} />}
         >
-          {editingImage ? 'Update Image' : 'Add Image'}
+          {editingImage ? "Update image" : "Add image"}
         </Button>
         {editingImage && (
           <Button

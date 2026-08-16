@@ -1,50 +1,42 @@
-import React from 'react';
-import { Input, Tooltip } from "@heroui/react";
+import React from "react";
+import { Input, Tooltip } from "./ui";
 import { Info } from "lucide-react";
 
-const FormField = ({ 
-  label, 
-  name, 
-  value, 
-  onChange, 
-  error, 
-  required, 
-  type = "text", 
+const FormField = ({
+  label,
+  name,
+  value,
+  onChange,
+  error,
+  required,
+  type = "text",
   description,
-  classNames = {} 
-}) => {
-  return (
-    <div className="mb-3">
-      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
-      <div className="relative">
-        <Input
-          type={type}
-          id={name}
-          name={name}
-          value={value}
-          onChange={onChange}
-          isRequired={required}
-          variant="bordered"
-          color={error ? "danger" : "primary"}
-          errorMessage={error}
-          fullWidth
-          classNames={{
-            input: "text-base",
-            inputWrapper: "bg-gray-50 hover:bg-gray-100 transition-colors",
-            ...classNames
-          }}
-        />
-        {description && (
+  classNames = {},
+  ...rest
+}) => (
+  <div className="mb-4">
+    <Input
+      label={label}
+      type={type}
+      id={name}
+      name={name}
+      value={value}
+      onChange={onChange}
+      isRequired={required}
+      errorMessage={error}
+      classNames={classNames}
+      endContent={
+        description ? (
           <Tooltip content={description}>
-            <Info className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-500 cursor-pointer" size={18} />
+            <span className="text-ink-soft" tabIndex={0} aria-label={description}>
+              <Info size={16} aria-hidden="true" />
+            </span>
           </Tooltip>
-        )}
-      </div>
-    </div>
-  );
-};
+        ) : null
+      }
+      {...rest}
+    />
+  </div>
+);
 
 export default FormField;

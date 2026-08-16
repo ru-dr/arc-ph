@@ -1,146 +1,84 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Card, CardBody, Spinner, Button, Tooltip, Tabs, Tab } from "@heroui/react";
+import { Spinner, Button, Tooltip, Tabs, Tab } from "../components/ui";
 import AddProjectCard from "../components/AddProjectCard";
 import LoginForm from "../components/LoginForm";
 import Link from "next/link";
-import { HelpCircle, ExternalLink, LogOut, Plus, Info, RefreshCw } from "lucide-react";
+import { HelpCircle, ExternalLink, LogOut, RefreshCw } from "lucide-react";
 import { useToast } from "../hooks/useToast";
 import dynamic from 'next/dynamic';
 import ProjectList from "../components/ProjectList";
 import CarouselManager from "../components/CarouselManager";
 import CarouselForm from "../components/CarouselForm";
 
-const SeeDocs = () => {
-  const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+const URL_EXAMPLES = [
+  {
+    label: "Collection URL",
+    url: "https://collection.cloudinary.com/your-cloud-name/[hash]",
+  },
+  {
+    label: "Image URL",
+    url: "https://res.cloudinary.com/your-cloud-name/image/upload/[version]/[file]",
+  },
+];
 
-  const exampleLinks = [
-    {
-      label: "Collection URL",
-      url: "https://collection.cloudinary.com/your-cloud-name/12345abcde67890fghij12345abcde67",
-    },
-    {
-      label: "Image URL",
-      url: "https://res.cloudinary.com/your-cloud-name/image/upload/v1234567890/sample.jpg",
-    },
-  ];
-
-  const tooltipContent = (
-    <div className="p-3 sm:p-5 inter rounded-lg max-w-md">
-      <h3 className="text-emerald-800 font-semibold mb-2 sm:mb-4 text-base sm:text-lg">
-        Cloudinary Collections Help
-      </h3>
-      <p className="text-emerald-700 mb-2 sm:mb-3 text-sm sm:text-base">
-        Example links:
-      </p>
-      <div className="space-y-2 sm:space-y-4">
-        {exampleLinks.map(({ label, url }) => (
-          <div key={label} className="flex flex-col gap-1 sm:gap-2">
-            <span className="px-2 sm:px-3 py-1 sm:py-1.5 text-emerald-800 rounded-full font-bold text-xs sm:text-sm inline-block w-max">
-              {label}
-            </span>
-            <div className="relative group">
-              <p className="cursor-pointer px-2 sm:px-3 py-1 sm:py-2 text-emerald-800 rounded-lg text-xs sm:text-sm break-all hover:bg-emerald-300 transition-colors duration-200 block">
-                {url}
-              </p>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const SeeDocsLinkClasses = `
-    inline-flex items-center px-3 sm:px-4 py-1 sm:py-2 rounded-full
-    text-emerald-800 bg-emerald-200
-    hover:bg-emerald-300
-    transition-all duration-300 ease-in-out transform hover:scale-105
-    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500
-    text-xs sm:text-sm inter
-  `;
+const UrlFormatHelp = () => {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <Tooltip
-      content={tooltipContent}
       placement="bottom"
-      isOpen={isTooltipOpen}
-      onOpenChange={(open) => setIsTooltipOpen(open)}
+      isOpen={isOpen}
+      onOpenChange={setIsOpen}
+      className="max-w-sm"
+      content={
+        <div className="p-1 text-left">
+          <p className="mb-2 text-xs font-medium">Accepted URL formats</p>
+          <dl className="space-y-2">
+            {URL_EXAMPLES.map(({ label, url }) => (
+              <div key={label}>
+                <dt className="text-[11px] text-[var(--ink-soft)]">{label}</dt>
+                <dd className="break-all text-[11px]">{url}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      }
     >
       <button
-        onClick={() => setIsTooltipOpen(!isTooltipOpen)}
-        className={SeeDocsLinkClasses}
-        aria-label="See Documentation"
+        type="button"
+        onClick={() => setIsOpen((open) => !open)}
+        className="inline-flex h-9 items-center gap-1.5 border border-edge px-3 text-sm transition-colors duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-ink"
       >
-        <HelpCircle size={14} className="mr-1.5" />
-        See Docs
+        <HelpCircle size={14} />
+        URL formats
       </button>
     </Tooltip>
   );
 };
 
-const CloudinaryDocs = () => {
-  const CloudinaryLinkClasses = `
-    inline-flex items-center px-3 sm:px-4 py-1 sm:py-2 rounded-full
-    text-blue-800 bg-blue-200
-    hover:bg-blue-300
-    transition-all duration-300 ease-in-out transform hover:scale-105
-    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-    text-xs sm:text-sm inter
-  `;
+const CloudinaryDocs = () => (
+  <Link
+    href="https://cloudinary.com/documentation/dam_folders_collections_sharing"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="inline-flex h-9 items-center gap-1.5 border border-edge px-3 text-sm transition-colors duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:border-ink"
+  >
+    <ExternalLink size={14} />
+    Cloudinary docs
+  </Link>
+);
 
-  return (
-    <Link
-      href="https://cloudinary.com/documentation/dam_folders_collections_sharing"
-      target="_blank"
-      rel="noopener noreferrer"
-      className={CloudinaryLinkClasses}
-    >
-      <ExternalLink size={14} className="mr-1.5" />
-      Cloudinary Docs
-    </Link>
-  );
-};
-
-const DocsLinks = () => {
-  const linkBaseClasses = `
-    inline-flex items-center px-3 sm:px-4 py-1 sm:py-2 rounded-full
-    transition-all duration-300 ease-in-out transform hover:scale-105
-    focus:outline-none focus:ring-2 focus:ring-offset-2
-    text-xs sm:text-sm inter
-  `;
-
-  return (
-    <div className="flex flex-wrap gap-2">
-      <Link
-        href="https://cloudinary.com/documentation/image_upload_api_reference"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`${linkBaseClasses} text-green-800 bg-green-200 hover:bg-green-300 focus:ring-green-500`}
-      >
-        <ExternalLink size={14} className="mr-1.5" />
-        Upload Guide
-      </Link>
-      <Tooltip
-        content={
-          <div className="p-3 max-w-xs">
-            <h3 className="font-semibold mb-2">URL Formats</h3>
-            <div className="space-y-2 text-sm">
-              <p><strong>Collection URL:</strong> https://collection.cloudinary.com/your-cloud-name/[hash]</p>
-              <p><strong>Image URL:</strong> https://res.cloudinary.com/your-cloud-name/image/upload/[version]/[file]</p>
-            </div>
-          </div>
-        }
-        placement="bottom"
-      >
-        <button className={`${linkBaseClasses} text-purple-800 bg-purple-200 hover:bg-purple-300 focus:ring-purple-500`}>
-          <HelpCircle size={14} className="mr-1.5" />
-          URL Guide
-        </button>
-      </Tooltip>
-    </div>
-  );
-};
+const Panel = ({ title, action, children }) => (
+  <section className="flex h-full flex-col border border-rule bg-paper">
+    <header className="flex items-baseline justify-between gap-4 border-b border-rule px-5 py-4">
+      <h2 className="display-sm text-lg sm:text-xl">{title}</h2>
+      {action}
+    </header>
+    <div className="flex-grow overflow-auto p-5">{children}</div>
+  </section>
+);
 
 const Dashboard = () => {
   const [projects, setProjects] = useState([]);
@@ -228,6 +166,7 @@ const Dashboard = () => {
   const handleLoginSuccess = () => {
     setIsAuthenticated(true);
     fetchProjects();
+    fetchImages();
   };
 
   const handleLogout = () => {
@@ -241,27 +180,21 @@ const Dashboard = () => {
     try {
       const newOrder = parseInt(projectData.order);
       const oldOrder = editingProject?.order;
-      
-      // Get all projects excluding the current one being edited
+
       const otherProjects = projects.filter(proj => proj._id !== editingProject?._id);
-      
-      // Reorder other projects based on the new order
+
       const reorderedProjects = otherProjects.map(proj => {
         if (editingProject) {
-          // When editing
           if (newOrder > oldOrder) {
-            // Moving down: decrease order of projects between old and new position
             if (proj.order > oldOrder && proj.order <= newOrder) {
               return { ...proj, order: proj.order - 1 };
             }
           } else if (newOrder < oldOrder) {
-            // Moving up: increase order of projects between new and old position
             if (proj.order >= newOrder && proj.order < oldOrder) {
               return { ...proj, order: proj.order + 1 };
             }
           }
         } else {
-          // When adding new: increase order of all projects at or after the insertion point
           if (proj.order >= newOrder) {
             return { ...proj, order: proj.order + 1 };
           }
@@ -269,7 +202,6 @@ const Dashboard = () => {
         return proj;
       });
 
-      // First update other projects if needed
       if (reorderedProjects.some(proj => proj.order !== projects.find(p => p._id === proj._id)?.order)) {
         const reorderResponse = await fetch("/api/projects/reorder", {
           method: "PUT",
@@ -284,7 +216,6 @@ const Dashboard = () => {
         }
       }
 
-      // Then add/update the current project
       const url = editingProject
         ? `/api/projects/${editingProject._id}`
         : "/api/projects";
@@ -305,7 +236,7 @@ const Dashboard = () => {
             : "Project added successfully",
           "success"
         );
-        await fetchProjects(); // Ensure fetchProjects is awaited
+        await fetchProjects();
         setEditingProject(null);
       } else {
         const errorData = await response.json();
@@ -340,14 +271,14 @@ const Dashboard = () => {
       const response = await fetch('/api/carousel/fix-numbers', {
         method: 'POST'
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fix numbers');
       }
 
       const data = await response.json();
       showToast(`Fixed ${data.images.length} image numbers`, 'success');
-      fetchImages(); // Refresh the images list
+      fetchImages();
     } catch (error) {
       console.error('Error fixing numbers:', error);
       showToast('Failed to fix image numbers', 'error');
@@ -366,116 +297,145 @@ const Dashboard = () => {
 
   if (!isAuthenticated) {
     return (
-      <div className={`inter bg-[#efebe0] min-h-screen flex items-center justify-center p-4`}>
-        <Card className="w-full max-w-md p-6">
-          <h1 className="text-2xl font-bold mb-6 text-center">Dashboard Login</h1>
+      <div className="flex min-h-screen items-center justify-center bg-paper p-5 text-ink">
+        <div className="w-full max-w-sm">
+          <Link
+            href="/"
+            className="text-sm font-medium uppercase tracking-[0.24em]"
+          >
+            Archi
+          </Link>
+          <h1 className="display mt-6 text-4xl">Dashboard</h1>
+          <p className="mt-2 mb-8 text-sm text-ink-soft">
+            Sign in to manage projects and carousel images.
+          </p>
           <LoginForm onLoginSuccess={handleLoginSuccess} />
-        </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className={`inter bg-[#efebe0] min-h-screen p-2 sm:p-8`}>
-      <div className="max-w-8xl mx-auto h-full flex flex-col">
-        <div className="flex flex-col sm:flex-row justify-between items-center mb-6 sm:mb-8 space-y-4 sm:space-y-0">
-          <h1 className="text-3xl sm:text-4xl font-bold text-center sm:text-left">
-            Dashboard
-          </h1>
-          <div className="flex flex-wrap justify-center sm:justify-end items-center gap-2 sm:gap-4">
-            <SeeDocs />
-            <CloudinaryDocs />
-            <Button
-              onClick={handleLogout}
-              color="danger"
-              variant="light"
-              startContent={<LogOut size={16} />}
-              className="text-sm px-3 py-1.5"
+    <div className="min-h-screen bg-paper text-ink">
+      <header className="sticky top-0 z-40 border-b border-rule bg-paper">
+        <div className="shell flex h-16 items-center justify-between gap-4 md:h-20">
+          <div className="flex items-baseline gap-3">
+            <Link
+              href="/"
+              className="text-sm font-medium uppercase tracking-[0.24em]"
             >
-              Logout
-            </Button>
-            {process.env.NODE_ENV === 'development' && (
+              Archi
+            </Link>
+            <span className="text-sm text-ink-soft">Dashboard</span>
+          </div>
+          <Button
+            onClick={handleLogout}
+            variant="light"
+            size="sm"
+            startContent={<LogOut size={14} />}
+          >
+            Log out
+          </Button>
+        </div>
+      </header>
+
+      <div className="shell py-8 md:py-12">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4 border-b border-rule pb-5">
+          <div>
+            <h1 className="display text-4xl md:text-6xl">Content</h1>
+            <p className="mt-2 text-sm text-ink-soft">
+              {projects.length} projects · {images.length} carousel images
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <UrlFormatHelp />
+            <CloudinaryDocs />
+            {process.env.NODE_ENV === "development" && (
               <Button
-                color="warning"
-                variant="flat"
+                size="sm"
                 onPress={handleFixNumbers}
                 isLoading={isFixingNumbers}
-                startContent={<RefreshCw size={20} />}
+                startContent={<RefreshCw size={14} />}
               >
-                Fix Carousel Numbers
+                Fix carousel numbers
               </Button>
             )}
           </div>
         </div>
-        <Tabs aria-label="Options">
+
+        <Tabs aria-label="Dashboard sections">
           <Tab key="projects" title="Projects">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-              <Card className="p-4 sm:p-6 h-full flex flex-col">
-                <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
-                  {editingProject ? "Edit Project" : "Add New Project"}
-                </h2>
-                <div className="flex-grow overflow-auto">
-                  <AddProjectCard
-                    onProjectSubmit={handleProjectSubmit}
-                    editingProject={editingProject}
-                    setEditingProject={setEditingProject}
-                    projects={projects}
-                  />
-                </div>
-              </Card>
-              <Card className="p-4 sm:p-6 h-full flex flex-col">
-                <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
-                  Current Projects
-                </h2>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+              <Panel title={editingProject ? "Edit project" : "Add project"}>
+                <AddProjectCard
+                  onProjectSubmit={handleProjectSubmit}
+                  editingProject={editingProject}
+                  setEditingProject={setEditingProject}
+                  projects={projects}
+                />
+              </Panel>
+              <Panel
+                title="Current projects"
+                action={
+                  <span className="text-xs text-ink-soft tabular-nums">
+                    {projects.length}
+                  </span>
+                }
+              >
                 {isProjectsLoading ? (
-                  <div className="flex justify-center items-center h-32 sm:h-40">
-                    <Spinner size="lg" />
+                  <div className="flex h-40 items-center justify-center">
+                    <Spinner size="lg" label="Loading projects" />
                   </div>
+                ) : projects.length === 0 ? (
+                  <p className="py-10 text-center text-sm text-ink-soft">
+                    No projects yet. Add one on the left and it appears on the
+                    portfolio.
+                  </p>
                 ) : (
-                  <div className="flex-grow overflow-auto">
-                    <ProjectList
-                      projects={projects}
-                      onProjectUpdated={fetchProjects}
-                      setEditingProject={setEditingProject}
-                    />
-                  </div>
+                  <ProjectList
+                    projects={projects}
+                    onProjectUpdated={fetchProjects}
+                    setEditingProject={setEditingProject}
+                  />
                 )}
-              </Card>
+              </Panel>
             </div>
           </Tab>
           <Tab key="carousel" title="Carousel">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-              <Card className="p-4 sm:p-6 h-full flex flex-col">
-                <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
-                  {editingImage ? "Edit Image" : "Add New Image"}
-                </h2>
-                <div className="flex-grow overflow-auto">
-                  <CarouselForm 
-                    onImageAdded={fetchImages} 
-                    images={images}
-                    editingImage={editingImage}
-                    setEditingImage={setEditingImage}
-                  />
-                </div>
-              </Card>
-              <Card className="p-4 sm:p-6 h-full flex flex-col">
-                <h2 className="text-xl sm:text-2xl font-semibold mb-3 sm:mb-4">
-                  Current Images
-                </h2>
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
+              <Panel title={editingImage ? "Edit image" : "Add image"}>
+                <CarouselForm
+                  onImageAdded={fetchImages}
+                  images={images}
+                  editingImage={editingImage}
+                  setEditingImage={setEditingImage}
+                />
+              </Panel>
+              <Panel
+                title="Current images"
+                action={
+                  <span className="text-xs text-ink-soft tabular-nums">
+                    {images.length}
+                  </span>
+                }
+              >
                 {isImagesLoading ? (
-                  <div className="flex justify-center items-center h-32 sm:h-40">
-                    <Spinner size="lg" />
+                  <div className="flex h-40 items-center justify-center">
+                    <Spinner size="lg" label="Loading images" />
                   </div>
+                ) : images.length === 0 ? (
+                  <p className="py-10 text-center text-sm text-ink-soft">
+                    No carousel images yet. Add one on the left and it appears
+                    on the home page.
+                  </p>
                 ) : (
-                  <div className="flex-grow overflow-auto">
-                    <CarouselManager
-                      images={images}
-                      onImagesUpdated={fetchImages}
-                      onEdit={setEditingImage}
-                    />
-                  </div>
+                  <CarouselManager
+                    images={images}
+                    onImagesUpdated={fetchImages}
+                    onEdit={setEditingImage}
+                  />
                 )}
-              </Card>
+              </Panel>
             </div>
           </Tab>
         </Tabs>

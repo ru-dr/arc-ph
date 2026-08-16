@@ -8,7 +8,6 @@ export async function PUT(request) {
     await dbConnect();
     const { images } = await request.json();
 
-    // Update each image's order
     const updatePromises = images.map((image) =>
       CarouselImage.findByIdAndUpdate(image._id, { order: image.order })
     );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Input, Button } from "@heroui/react";
+import { Input, Button } from "./ui";
 import { useToast } from "../hooks/useToast";
 
 const LoginForm = ({ onLoginSuccess }) => {
@@ -35,12 +35,12 @@ const LoginForm = ({ onLoginSuccess }) => {
       showToast("An error occurred during login", "error");
     } finally {
       setIsLoading(false);
-      setPassword(""); // Clear password on error
+      setPassword("");
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="space-y-6">
+    <form onSubmit={handleLogin} className="space-y-4">
       <Input
         type="text"
         label="Username"
@@ -48,9 +48,6 @@ const LoginForm = ({ onLoginSuccess }) => {
         value={username}
         onChange={(e) => setUsername(e.target.value)}
         required
-        variant="bordered"
-        color="primary"
-        size="lg"
         className="w-full"
         autoComplete="username"
       />
@@ -61,9 +58,6 @@ const LoginForm = ({ onLoginSuccess }) => {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
-        variant="bordered"
-        color="primary"
-        size="lg"
         className="w-full"
         autoComplete="current-password"
       />
@@ -72,10 +66,9 @@ const LoginForm = ({ onLoginSuccess }) => {
         color="primary"
         size="lg"
         isLoading={isLoading}
-        disabled={isLoading}
         className="w-full"
       >
-        {isLoading ? "Logging in..." : "Login"}
+        Sign in
       </Button>
     </form>
   );

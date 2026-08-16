@@ -1,147 +1,135 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import gsap from "gsap";
 
-const Navbar = () => {
-  const menuItems = [
-    { id: 1, title: "Services", tag: "services" },
-    { id: 2, title: "Timings", tag: "timings" },
-    { id: 3, title: "Contact", tag: "contact" },
-  ];
+const SECTION_LINKS = [
+  { title: "Work", tag: "work" },
+  { title: "Services", tag: "services" },
+  { title: "Hours", tag: "hours" },
+  { title: "Contact", tag: "contact" },
+];
 
+const Navbar = ({ variant = "home" }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const panelRef = useRef(null);
+  const sectionLinks = variant === "home" ? SECTION_LINKS : [];
+  const menuItems = [...sectionLinks, { title: "Portfolio", href: "/portfolio" }];
 
   const scrollToElement = (e, id) => {
-    e.preventDefault();
     const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    } else {
-      console.error(`Element with id '${id}' not found.`);
-    }
+    if (!element) return;
+    e.preventDefault();
+    setIsMenuOpen(false);
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   useEffect(() => {
-    const tl = gsap.timeline({});
-
-    // Function to calculate the height of the ul element
-    const ulElement = document.querySelector("#navbar-hamburger ul");
-    const ulHeight = ulElement.scrollHeight;
-
-    if (isMenuOpen) {
-      tl.set("#navbar-hamburger ul", { height: 0, overflow: "hidden" })
-        .to("#navbar-hamburger ul", {
-          height: ulHeight, // Use the calculated height
-          duration: 0.5,
-          ease: "power2.out",
-          onComplete: function () {
-            gsap.set("#navbar-hamburger ul", { height: "auto" });
-          },
-        })
-        .fromTo(
-          "#navbar-hamburger li",
-          { opacity: 0, y: -20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "power2.out",
-            stagger: 0.2,
-          }
-        );
-    }
-
-    return () => {
-      tl.kill();
-    };
+    if (!isMenuOpen) return;
+    const onKeyDown = (e) => e.key === "Escape" && setIsMenuOpen(false);
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
   }, [isMenuOpen]);
 
-  useEffect(() => {
-    const tl = gsap.timeline({});
-
-    tl.set(".nav-items li", { opacity: 0, y: -20 }).to(".nav-items li", {
-      opacity: 1,
-      y: 0,
-      duration: 0.8,
-      ease: "power2.out",
-      stagger: 0.2,
-    });
-  }, []);
-
   return (
-    <nav className="dark:bg-gray-800 dark:border-gray-700 transition-all ease-in-out duration-300 pt-5 px-2">
-      <div className="flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link href="/">
-          <p className="flex items-center rtl:space-x-reverse">
-            <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-              {" "}
-            </span>
-          </p>
+
+    <nav className="sticky top-0 z-50 border-b border-rule bg-paper [contain:layout_paint]">
+      <div className="shell flex h-16 items-center justify-between md:h-20">
+        <Link href="/" className="text-sm font-medium tracking-[0.24em] uppercase">
+          Archi
         </Link>
+
         <button
-          data-collapse-toggle="navbar-hamburger"
           type="button"
-          className="md:hidden inline-flex items-center justify-center p-2 w-10 h-10 text-sm text-gray-500 rounded-lg focus:outline-none focus:ring-2 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-          aria-controls="navbar-hamburger"
+          className="-mr-2 inline-flex h-10 w-10 items-center justify-center transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.94] md:hidden"
+          aria-controls="nav-panel"
           aria-expanded={isMenuOpen}
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          onClick={() => setIsMenuOpen((open) => !open)}
         >
-          <svg
-            className="w-5 h-5"
-            aria-hidden="true"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 17 14"
-          >
-            <path
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M1 1h15M1 7h15M1 13h15"
+          <span className="relative block h-3 w-5" aria-hidden="true">
+            <span
+              className={`absolute left-0 top-0 h-px w-5 bg-current transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+                isMenuOpen ? "translate-y-[6px] rotate-45" : ""
+              }`}
             />
-          </svg>
+            <span
+              className={`absolute bottom-0 left-0 h-px w-5 bg-current transition-transform duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] ${
+                isMenuOpen ? "-translate-y-[6px] -rotate-45" : ""
+              }`}
+            />
+          </span>
         </button>
-        <div
-          className={`${
-            isMenuOpen ? "flex" : "hidden"
-          } md:flex w-full md:w-auto`}
-          id="navbar-hamburger"
-        >
-          <ul className="nav-items flex flex-col md:flex-row font-medium mt-4 md:mt-0 md:space-x-8 rounded-lg dark:bg-gray-800 dark:border-gray-700 items-start md:items-center">
-            {menuItems.map((item) => (
-              <li key={item.id}>
-                <Link
-                  href={`#${item.tag}`}
-                  className="text-black group transition duration-300"
-                  onClick={(e) => scrollToElement(e, item.tag)}
-                >
-                  <p className="block py-1">{item.title}</p>
-                  <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1px] bg-black"></span>
-                </Link>
-              </li>
-            ))}
-            <li>
+
+        <ul className="hidden items-center gap-8 text-sm md:flex">
+          {sectionLinks.map((item) => (
+            <li key={item.tag}>
               <Link
-                href="/portfolio"
-                className="text-black group transition duration-300"
+                href={`#${item.tag}`}
+                className="link-underline"
+                onClick={(e) => scrollToElement(e, item.tag)}
               >
-                <p className="block py-1">Portfolio</p>
-                <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1px] bg-black"></span>
+                {item.title}
               </Link>
             </li>
-            <li>
+          ))}
+          <li>
+            <Link href="/portfolio" className="link-underline">
+              Portfolio
+            </Link>
+          </li>
+          <li>
+            <Link
+              href="/form"
+              className="inline-flex h-9 items-center border border-ink px-4 transition-[background-color,color,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-ink hover:text-paper active:scale-[0.97]"
+            >
+              Book now
+            </Link>
+          </li>
+        </ul>
+      </div>
+
+      <div
+        id="nav-panel"
+        ref={panelRef}
+        aria-hidden={!isMenuOpen}
+        inert={!isMenuOpen}
+        className={`grid overflow-hidden border-t border-rule transition-[grid-template-rows,opacity] duration-[260ms] ease-[cubic-bezier(0.23,1,0.32,1)] md:hidden ${
+          isMenuOpen
+            ? "grid-rows-[1fr] border-rule opacity-100"
+            : "grid-rows-[0fr] border-transparent opacity-0"
+        }`}
+      >
+        <ul className="shell flex min-h-0 flex-col py-3 text-lg">
+          {menuItems.map((item, i) => (
+            <li
+              key={item.href ?? item.tag}
+              className="border-b border-rule/60 py-3 transition-[opacity,transform] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
+              style={{
+                opacity: isMenuOpen ? 1 : 0,
+                transform: isMenuOpen ? "translateY(0)" : "translateY(-6px)",
+                transitionDelay: `${isMenuOpen ? 60 + i * 35 : 0}ms`,
+              }}
+            >
               <Link
-                href="/form"
-                className="text-black group transition duration-300"
+                href={item.href ?? `#${item.tag}`}
+                onClick={(e) =>
+                  item.tag ? scrollToElement(e, item.tag) : setIsMenuOpen(false)
+                }
               >
-                <p className="block text-black py-1">Book Now</p>
-                <span className="block max-w-0 group-hover:max-w-full transition-all duration-500 h-[1px] bg-black"></span>
+                {item.title}
               </Link>
             </li>
-          </ul>
-        </div>
+          ))}
+          <li className="py-4">
+            <Link
+              href="/form"
+              onClick={() => setIsMenuOpen(false)}
+              className="inline-flex h-11 items-center border border-ink px-5 text-base transition-transform duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97]"
+            >
+              Book now
+            </Link>
+          </li>
+        </ul>
       </div>
     </nav>
   );

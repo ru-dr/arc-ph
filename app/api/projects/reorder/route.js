@@ -7,8 +7,7 @@ export async function PUT(request) {
     await dbConnect();
     const { projects } = await request.json();
 
-    // Update all projects with their new order
-    const updatePromises = projects.map(project => 
+    const updatePromises = projects.map(project =>
       Project.findByIdAndUpdate(
         project._id,
         { order: project.order },
@@ -18,15 +17,15 @@ export async function PUT(request) {
 
     await Promise.all(updatePromises);
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       message: 'Projects reordered successfully',
-      projectsUpdated: projects.length 
+      projectsUpdated: projects.length
     });
   } catch (error) {
     console.error('Error reordering projects:', error);
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: 'Failed to reorder projects',
-      details: error.message 
+      details: error.message
     }, { status: 500 });
   }
 } 

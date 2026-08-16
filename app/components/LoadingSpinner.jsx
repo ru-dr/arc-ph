@@ -1,11 +1,9 @@
-import { Spinner } from "@heroui/react";
+import { Spinner } from "./ui";
 
-const LoadingSpinner = () => {
-  return (
-    <div className="flex justify-center items-center min-h-[50vh]">
-      <Spinner size="lg" />
-    </div>
-  );
-};
+const LoadingSpinner = () => (
+  <div className="flex min-h-[40vh] items-center justify-center">
+    <Spinner size="lg" />
+  </div>
+);
 
-export default LoadingSpinner; 
+export default LoadingSpinner;

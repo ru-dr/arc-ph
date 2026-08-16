@@ -1,14 +1,26 @@
-import { Button, Spinner } from "@heroui/react";
+import { Button } from "./ui";
 
 const ProjectFormButtons = ({ isLoading, buttonLoading, editingProject, handleCancelEdit }) => {
   return (
-    <div className="flex space-x-4 mt-6">
-      <Button type="submit" color="primary" disabled={isLoading || buttonLoading !== null}>
-        {buttonLoading === 'submit' ? <Spinner size="sm" /> : (editingProject ? 'Update Project' : 'Add Project')}
+    <div className="mt-6 flex gap-3">
+      <Button
+        type="submit"
+        color="primary"
+        className="flex-1"
+        isLoading={buttonLoading === "submit"}
+        disabled={isLoading || buttonLoading !== null}
+      >
+        {editingProject ? "Update project" : "Add project"}
       </Button>
       {editingProject && (
-        <Button color="secondary" onClick={handleCancelEdit} disabled={isLoading || buttonLoading !== null}>
-          {buttonLoading === 'cancel' ? <Spinner size="sm" /> : 'Cancel Edit'}
+        <Button
+          variant="light"
+          className="flex-1"
+          onPress={handleCancelEdit}
+          isLoading={buttonLoading === "cancel"}
+          disabled={isLoading || buttonLoading !== null}
+        >
+          Cancel
         </Button>
       )}
     </div>

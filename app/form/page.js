@@ -3,10 +3,9 @@ import { useState, useEffect, useCallback } from "react";
 import { z } from "zod";
 import Image from "next/image";
 import Link from "next/link";
-import { Checkbox } from "@heroui/react";
+import { Button, Checkbox, Spinner } from "../components/ui";
 import FormField from "../components/FormField";
 import { useToast } from "../hooks/useToast";
-import { Loader2 } from "lucide-react";
 const schema = z.object({
   name: z.string().nonempty("Name is required"),
   ownerName: z.string().optional(),
@@ -77,7 +76,7 @@ export default function FormPage() {
       });
 
       if (response.ok) {
-        showToast("Form submitted successfully", "success");
+        showToast("Booking request sent", "success");
         setFormData({
           name: "",
           ownerName: "",
@@ -92,7 +91,7 @@ export default function FormPage() {
 
         setTimeout(() => {
           showToast(
-            `Call scheduled for ${formData.date} at ${formData.time}`,
+            `Requested for ${formData.date} at ${formData.time}`,
             "success"
           );
         }, 1000);
@@ -115,102 +114,142 @@ export default function FormPage() {
   };
 
   if (!isClient) {
-    return <Loader2 className="animate-spin" />;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-paper">
+        <Spinner size="lg" label="Loading the booking form" />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white text-gray-800 inter">
-      <div className="p-5 rounded-xl max-w-6xl w-full flex flex-col md:flex-row">
-        <div className="w-full md:w-1/2 p-4 hidden md:block">
-          <div className="w-full h-full relative">
+    <div className="min-h-screen bg-paper text-ink">
+      <div className="shell flex h-16 items-center justify-between border-b border-rule md:h-20">
+        <Link href="/" className="text-sm font-medium uppercase tracking-[0.24em]">
+          Archi
+        </Link>
+        <Link href="/portfolio" className="link-underline text-sm">
+          Portfolio
+        </Link>
+      </div>
+
+      <div className="shell grid grid-cols-1 gap-12 py-12 md:grid-cols-12 md:py-20">
+        <div className="md:col-span-5">
+          <h1 className="display text-[clamp(2.5rem,7vw,5rem)]">Book a shoot</h1>
+          <p className="measure mt-4 text-base text-ink-soft">
+            Tell us about the property and the dates that suit, and we&apos;ll
+            be in touch about availability and pricing.
+          </p>
+
+          <div className="relative mt-10 hidden h-[52vh] overflow-hidden bg-paper-2 md:block">
             <Image
-              className="object-cover rounded-xl"
-              layout="fill"
-              src="https://images.pexels.com/photos/1080696/pexels-photo-1080696.jpeg?auto=compress&cs=tinysrgb&w=600"
-              alt="About us image"
+              className="object-cover"
+              fill
+              sizes="(min-width: 768px) 42vw, 100vw"
+              src="https://images.pexels.com/photos/1080696/pexels-photo-1080696.jpeg?auto=compress&cs=tinysrgb&w=1200"
+              alt="Interior of a light-filled home"
             />
           </div>
+
+          <p className="mt-8 text-sm text-ink-soft">
+            Prefer email?{" "}
+            <Link
+              href="mailto:sales@archiphotography.com"
+              className="link-underline text-ink"
+            >
+              sales@archiphotography.com
+            </Link>
+          </p>
         </div>
-        <form onSubmit={handleSubmit} className="w-full md:w-1/2 p-4">
-          <h2 className="text-2xl font-bold mb-6 text-gray-800">Book Now</h2>
-          <FormField
-            label="Name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            error={errors.name}
-            required
-          />
-          <FormField
-            label={<span className="text-gray-500">Owner&apos;s Name (Optional)</span>}
-            name="ownerName"
-            value={formData.ownerName}
-            onChange={handleChange}
-            error={errors.ownerName}
-            classNames={{
-              inputWrapper: "bg-gray-50/50 hover:bg-gray-100/50",
-              input: "text-gray-500"
-            }}
-          />
-          <FormField
-            label="Email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            error={errors.email}
-            required
-          />
-          <FormField
-            label="Phone Number"
-            name="number"
-            type="tel"
-            value={formData.number}
-            onChange={handleChange}
-            error={errors.number}
-            required
-          />
-          <FormField
-            label={<span className="text-gray-500">Owner&apos;s Phone Number (Optional)</span>}
-            name="ownerNumber"
-            type="tel"
-            value={formData.ownerNumber}
-            onChange={handleChange}
-            error={errors.ownerNumber}
-            classNames={{
-              inputWrapper: "bg-gray-50/50 hover:bg-gray-100/50",
-              input: "text-gray-500"
-            }}
-          />
-          <FormField
-            label="Property Address"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            error={errors.address}
-            required
-          />
-          <FormField
-            label="Date"
-            name="date"
-            type="date"
-            value={formData.date}
-            onChange={handleChange}
-            error={errors.date}
-            required
-          />
-          <FormField
-            label="Time"
-            name="time"
-            type="time"
-            value={formData.time}
-            onChange={handleChange}
-            error={errors.time}
-            required
-          />
-          <div className="mb-2">
-            <label className="block text-gray-800">Services</label>
-            <div className="mt-1 grid sm:grid-cols-1 md:grid-cols-2 gap-4 min-w-full">
+
+        <form onSubmit={handleSubmit} className="md:col-span-6 md:col-start-7" noValidate>
+          <fieldset className="border-0 p-0">
+            <legend className="mb-4 w-full border-b border-rule pb-2 text-sm text-ink-soft">
+              Your details
+            </legend>
+            <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
+              <FormField
+                label="Name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                error={errors.name}
+                required
+              />
+              <FormField
+                label="Owner's name (optional)"
+                name="ownerName"
+                value={formData.ownerName}
+                onChange={handleChange}
+                error={errors.ownerName}
+              />
+              <FormField
+                label="Email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                error={errors.email}
+                required
+              />
+              <FormField
+                label="Phone number"
+                name="number"
+                type="tel"
+                value={formData.number}
+                onChange={handleChange}
+                error={errors.number}
+                required
+              />
+              <FormField
+                label="Owner's phone (optional)"
+                name="ownerNumber"
+                type="tel"
+                value={formData.ownerNumber}
+                onChange={handleChange}
+                error={errors.ownerNumber}
+              />
+            </div>
+          </fieldset>
+
+          <fieldset className="mt-8 border-0 p-0">
+            <legend className="mb-4 w-full border-b border-rule pb-2 text-sm text-ink-soft">
+              The shoot
+            </legend>
+            <FormField
+              label="Property address"
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              error={errors.address}
+              required
+            />
+            <div className="grid grid-cols-1 gap-x-6 sm:grid-cols-2">
+              <FormField
+                label="Preferred date"
+                name="date"
+                type="date"
+                value={formData.date}
+                onChange={handleChange}
+                error={errors.date}
+                required
+              />
+              <FormField
+                label="Preferred time"
+                name="time"
+                type="time"
+                value={formData.time}
+                onChange={handleChange}
+                error={errors.time}
+                required
+              />
+            </div>
+          </fieldset>
+
+          <fieldset className="mt-8 border-0 p-0">
+            <legend className="mb-4 w-full border-b border-rule pb-2 text-sm text-ink-soft">
+              Services
+            </legend>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               {[
                 "Photography",
                 "Floor Planning 2D Colored",
@@ -222,26 +261,26 @@ export default function FormPage() {
                   name="services"
                   value={service}
                   onChange={handleChange}
-                  radius="sm"
                   isSelected={formData.services.includes(service)}
                 >
                   {service}
                 </Checkbox>
               ))}
             </div>
-          </div>
-          <button
+          </fieldset>
+
+          <Button
             type="submit"
-            className="w-full py-2 px-4 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            disabled={isSubmitting}
+            color="primary"
+            size="lg"
+            className="mt-8 w-full"
+            isLoading={isSubmitting}
           >
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </button>
-          <p className="mt-4 text-sm text-gray-600 text-center">
-            Need help?{" "}
-            <Link href="mailto:sales@archiphotography.com">
-              <span className="text-indigo-600 pl-2">Contact us</span>
-            </Link>
+            {isSubmitting ? "Sending" : "Request this booking"}
+          </Button>
+          <p className="mt-3 text-xs text-ink-soft">
+            This is a booking request, not a confirmed booking. No payment is
+            taken here.
           </p>
         </form>
       </div>

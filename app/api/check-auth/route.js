@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export async function POST(request) {
   try {
     const { username, password } = await request.json();
-    
+
     const validUsername = process.env.DASHBOARD_USERNAME;
     const validPassword = process.env.DASHBOARD_PASSWORD;
 

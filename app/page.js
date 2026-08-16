@@ -1,146 +1,131 @@
-// import About from "./components/About";
-// import Hero from "./components/Hero";
-// import Highlights from "./components/Highlights";
-// import Projects from "./components/Projects";
-
-// export default function Home() {
-//   return (
-//     <main className="min-h-[100dvh] text-black w-full flex flex-col  bg-[#1c1c1c]">
-//       <Hero />
-//       <About />
-//       <Projects />
-//       <Highlights />
-//     </main>
-//   );
-// }
 "use client";
 import { useEffect } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import Lenis from "lenis";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import dynamic from "next/dynamic";
 import Navbar from "./components/Navbar";
-import dynamic from 'next/dynamic';
 import Services from "./components/Services";
 import Footer from "./components/Footer";
-import LoadingSpinner from './components/LoadingSpinner';
+import LoadingSpinner from "./components/LoadingSpinner";
+import { Intro, MaskedLine, Reveal } from "./components/motion";
 
-const Crousel = dynamic(() => import('./components/Crousel'), {
+const Crousel = dynamic(() => import("./components/Crousel"), {
   loading: () => <LoadingSpinner />,
-  ssr: false
+  ssr: false,
 });
 
+const hours = [
+  { day: "Monday — Friday", time: "8:00 am – 5:00 pm" },
+  { day: "Saturday — Sunday", time: "8:00 am – 5:30 pm" },
+];
+
 export default function Home() {
-  useEffect(() => {
-    const lenis = new Lenis();
 
-    lenis.on("scroll", (e) => {
-      console.log(e);
-    });
-
-    lenis.on("scroll", ScrollTrigger.update);
-
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-
-    gsap.ticker.lagSmoothing(0);
-  }, []);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!fine || reduced) return;
 
-    const tl3 = gsap.timeline({});
+    const lenis = new Lenis({ lerp: 0.12, syncTouch: false });
+    let frame = requestAnimationFrame(function loop(time) {
+      lenis.raf(time);
+      frame = requestAnimationFrame(loop);
+    });
 
-    tl3.fromTo(
-      ".timings-list",
-      { y: 200, opacity: 0 },
-      {
-        y: 0,
-        stagger: 0.7,
-        opacity: 1,
-        duration: 2,
-        ease: "power4.out",
-        scrollTrigger: {
-          trigger: ".timings-list",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
-      }
-    );
+    return () => {
+      cancelAnimationFrame(frame);
+      lenis.destroy();
+    };
   }, []);
-
-  const timings = [
-    {
-      title: "Monday - Friday",
-      description: "8:00 AM - 5:00 PM",
-    },
-    {
-      title: "Saturday - Sunday",
-      description: "8:00 AM - 5:30 PM",
-    },
-  ];
 
   return (
-    <>
-      <main className="inter bg-[#efebe0] min-h-screen">
-        <Navbar />
-        <div className="flex h-1/2 p-5 main-text">
-          <div className="flex flex-col text-left py-5 sm:py-8 md:py-10 lg:py-12 xl:py-16">
-            <h1 className="text-3xl md:text-5xl lg:text-[6rem] font-semibold text-black tracking-wide scale-y-105 leading-tight">
-              Archi &#8211;
-            </h1>
-            <h2 className="text-3xl md:text-5xl lg:text-[6rem] font-semibold text-black tracking-wide scale-y-105 leading-tight">
-              Photography & Drafting
-            </h2>
-          </div>
+    <main className="min-h-screen bg-paper text-ink">
+      <Navbar />
+
+      <header className="shell pt-10 pb-16 md:pt-16 md:pb-24">
+        <h1 className="display text-[clamp(3.25rem,13vw,11rem)]">
+          <MaskedLine>Archi</MaskedLine>
+          <MaskedLine delay={0.09} className="italic text-ink-soft">
+            Photography
+          </MaskedLine>
+        </h1>
+
+        <div className="mt-8 grid grid-cols-1 gap-8 border-t border-rule pt-6 md:mt-14 md:grid-cols-12">
+          <Intro as="p" delay={0.38} className="measure md:col-span-5 text-base leading-relaxed text-ink-soft md:text-lg">
+            An Adelaide studio shooting property, interiors and architecture —
+            with 2D and 3D floor plans drawn to match. Rooms photographed the
+            way they are lived in.
+          </Intro>
+
+          <Intro delay={0.44} className="md:col-span-3 md:col-start-7">
+            <p className="kicker">Studio hours</p>
+            <p className="mt-2 text-sm">Mon–Fri 8–5 · Sat–Sun 8–5:30</p>
+            <p className="mt-1 text-sm text-ink-soft">Adelaide, SA</p>
+          </Intro>
+
+          <Intro delay={0.5} className="flex flex-wrap items-center gap-x-6 gap-y-3 md:col-span-3 md:col-start-10 md:justify-end">
+            <Link
+              href="/form"
+              className="inline-flex h-11 items-center border border-ink px-6 text-sm transition-[background-color,color,transform] duration-150 ease-[cubic-bezier(0.23,1,0.32,1)] hover:bg-ink hover:text-paper active:scale-[0.97]"
+            >
+              Book a shoot
+            </Link>
+            <Link href="#work" className="link-underline text-sm">
+              See the work
+            </Link>
+          </Intro>
+        </div>
+      </header>
+
+      <div className="shell">
+        <Intro delay={0.24} y={24} className="hero-frame relative h-[52vh] overflow-hidden bg-paper-2 md:h-[82vh] [clip-path:inset(0_0_0_0)]">
+          <Image
+            src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1920&q=70"
+            alt="Sunlit living room with timber floors and large windows"
+            fill
+            priority
+            quality={68}
+            sizes="(min-width: 1536px) 1440px, 100vw"
+            style={{ objectFit: "cover" }}
+          />
+        </Intro>
+      </div>
+
+      <section id="work" className="pt-20 md:pt-32">
+        <div className="shell mb-8 flex items-end justify-between gap-6 border-b border-rule pb-4 md:mb-12">
+          <h2 className="display text-3xl md:text-5xl">Selected work</h2>
+          <Link href="/portfolio" className="link-underline pb-1 text-sm">
+            Every project
+          </Link>
         </div>
         <Crousel />
-        <div
-          className="text-black text-xl font-medium p-5 right-0 text-right"
-          id="services"
-        >
-          ...
-        </div>
-        <Services />
-        <div
-          className="text-black text-xl font-medium p-5 right-0 text-right "
-          id="timings"
-        >
-          ...
-        </div>
-        <div className="h-10"></div>
-        {/* add a timings section */}
-        <div className="p-5 flex flex-col lg:flex-row md:flex-row justify-between ">
-          <div className="w-[55%] services">
-            <h1 className="text-4xl md:text-4xl lg:text-8xl font-bold text-black">
-              Timings &#8211;
-            </h1>
-          </div>
-          {/* spacer */}
-          <div className="h-10"></div>
-          <div className="w-full lg:w-[60%]">
-            {timings.map((timings, index) => (
-              <div key={index} className="">
-                <div className="flex flex-col w-full service-list">
-                  <h2 className="lg:text-4xl text-2xl font-semibold text-black">
-                    {timings.title}
-                  </h2>
-                  <div className="h-5"></div>
-                  <p className="text-black text-wrap text-sm lg:text-xl font-light">
-                    {timings.description}
-                  </p>
-                </div>
-                <div className="h-[1px] bg-black w-full mt-10"></div>
-                <div className="h-10"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <Footer />
-        {/* spacer */}
-        <div className="h-10"></div>
-      </main>
-    </>
+      </section>
+
+      <Services />
+
+      <section id="hours" className="shell pb-20 md:pb-32">
+        <h2 className="display border-b border-rule pb-4 text-3xl md:text-5xl">
+          Hours
+        </h2>
+        <dl>
+          {hours.map((slot) => (
+            <Reveal
+              key={slot.day}
+              className="flex flex-col gap-1 border-b border-rule py-6 md:flex-row md:items-baseline md:justify-between md:py-8"
+            >
+              <dt className="text-xl md:text-2xl">{slot.day}</dt>
+              <dd className="text-sm text-ink-soft md:text-lg">{slot.time}</dd>
+            </Reveal>
+          ))}
+        </dl>
+        <Reveal as="p" className="mt-6 text-sm text-ink-soft">
+          For times outside these hours, ask when you get in touch.
+        </Reveal>
+      </section>
+
+      <Footer />
+    </main>
   );
 }

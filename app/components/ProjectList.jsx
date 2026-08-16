@@ -8,7 +8,7 @@ import {
   useDisclosure,
   Input,
   Button,
-} from "@heroui/react";
+} from "./ui";
 import { Search, GripVertical } from "lucide-react";
 import { useToast } from "../hooks/useToast";
 import DraggableProjectList from "./DraggableProjectList";
@@ -32,7 +32,6 @@ const ProjectList = ({ projects, onProjectUpdated, setEditingProject }) => {
     setFilteredProjects(results);
   }, [searchTerm, projects]);
 
-  // Memoize the filtered projects to prevent unnecessary re-renders
   const currentFilteredProjects = useMemo(() => {
     if (!filteredProjects) return [];
     return filteredProjects;
@@ -93,19 +92,19 @@ const ProjectList = ({ projects, onProjectUpdated, setEditingProject }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="sticky top-0 bg-white z-10 pb-4">
+      <div className="sticky top-0 z-10 bg-paper pb-4">
         <div className="flex items-center gap-4">
           <div className="flex-1">
             <Input
               clearable
               contentLeft={<Search size={16} />}
-              placeholder="Search projects..."
+              placeholder="Search projects"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               variant="bordered"
             />
           </div>
-          
+
         </div>
       </div>
       <div className="flex-grow overflow-auto">
@@ -123,13 +122,12 @@ const ProjectList = ({ projects, onProjectUpdated, setEditingProject }) => {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                Confirm Deletion
+                Delete project?
               </ModalHeader>
               <ModalBody>
                 <p>
-                  Are you sure you want to delete the project &#34;
-                  {projectToDelete?.projectName}&#34;? This action cannot be
-                  undone.
+                  &#34;{projectToDelete?.projectName}&#34; will be removed from
+                  the portfolio. This cannot be undone.
                 </p>
               </ModalBody>
               <ModalFooter>
@@ -137,7 +135,7 @@ const ProjectList = ({ projects, onProjectUpdated, setEditingProject }) => {
                   Cancel
                 </Button>
                 <Button color="danger" onPress={handleDelete}>
-                  Delete
+                  Delete project
                 </Button>
               </ModalFooter>
             </>

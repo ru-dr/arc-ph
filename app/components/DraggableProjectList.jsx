@@ -1,12 +1,12 @@
 import { useState, useRef, useCallback } from 'react';
 import ProjectCard from './ProjectCard';
-import { Pagination } from "@heroui/react";
+import { Pagination } from "./ui";
 
-const DraggableProjectList = ({ 
-  projects, 
-  onReorder, 
-  onEdit, 
-  onDelete, 
+const DraggableProjectList = ({
+  projects,
+  onReorder,
+  onEdit,
+  onDelete,
   deletingId
 }) => {
   const [localProjects, setLocalProjects] = useState(projects);
@@ -23,7 +23,7 @@ const DraggableProjectList = ({
 
   const handleDragEnd = useCallback(async () => {
     setDraggedIndex(null);
-    
+
     try {
       await onReorder(localProjects);
     } catch (error) {
@@ -49,7 +49,6 @@ const DraggableProjectList = ({
     setDraggedIndex(index);
   }, [draggedIndex, localProjects]);
 
-  // Calculate pagination
   const totalPages = Math.ceil(localProjects.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -57,7 +56,7 @@ const DraggableProjectList = ({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         {currentProjects.map((project, index) => (
           <ProjectCard
             key={project._id}

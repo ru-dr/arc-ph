@@ -1,6 +1,14 @@
-/** @type {import('next').NextConfig} */
+
 const nextConfig = {
-  // allow cors for submit-form.com
+  async redirects() {
+    return [
+      {
+        source: "/carousel",
+        destination: "/dashboard",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {
@@ -15,6 +23,10 @@ const nextConfig = {
     ];
   },
   images: {
+    formats: ["image/avif", "image/webp"],
+
+    qualities: [68, 70, 75],
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     remotePatterns: [
       {
         protocol: "https",

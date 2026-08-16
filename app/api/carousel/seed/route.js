@@ -56,16 +56,14 @@ const seedImages = [
 export async function GET() {
   try {
     await dbConnect();
-    
-    // Clear existing images
+
     await CarouselImage.deleteMany({});
-    
-    // Insert new images
+
     const images = await CarouselImage.insertMany(seedImages);
-    
-    return NextResponse.json({ 
+
+    return NextResponse.json({
       message: 'Carousel images seeded successfully',
-      count: images.length 
+      count: images.length
     });
   } catch (error) {
     console.error('Error seeding carousel images:', error);

@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import CarouselCard from "./CarouselCard";
-import { Pagination } from "@heroui/react";
+import { Pagination } from "./ui";
 
 const DraggableCarouselList = ({
   images,
@@ -23,7 +23,7 @@ const DraggableCarouselList = ({
 
   const handleDragEnd = useCallback(async () => {
     setDraggedIndex(null);
-    
+
     try {
       await onReorder(localImages);
     } catch (error) {
@@ -49,7 +49,6 @@ const DraggableCarouselList = ({
     setDraggedIndex(index);
   }, [draggedIndex, localImages]);
 
-  // Calculate pagination
   const totalPages = Math.ceil(localImages.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -57,7 +56,7 @@ const DraggableCarouselList = ({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         {currentImages.map((image, index) => (
           <CarouselCard
             key={image._id}

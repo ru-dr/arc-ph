@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Image, Tooltip } from "@heroui/react";
+import { Image, Tooltip } from "./ui";
 import { useToast } from "../hooks/useToast";
 import ProjectFormInputs from "./ProjectFormInputs";
 import ProjectFormButtons from "./ProjectFormButtons";
@@ -27,8 +27,7 @@ const AddProjectCard = ({
     if (editingProject) {
       setFormData(editingProject);
     } else {
-      // Find the highest order number
-      const maxOrder = projects.length > 0 
+      const maxOrder = projects.length > 0
         ? Math.max(...projects.map(proj => proj.order || 0))
         : 0;
       setFormData(prev => ({
@@ -98,13 +97,12 @@ const AddProjectCard = ({
   };
 
   const tooltipContent = (
-    <div className="p-3 sm:p-5 inter rounded-lg max-w-md">
-      <h3 className="text-emerald-800 font-semibold mb-2 sm:mb-4 text-base sm:text-lg">
-        Image Preview Notice
-      </h3>
-      <p className="text-emerald-700 text-sm sm:text-base">
-        This is a preview. The actual image will be displayed in full
-        orientation.
+    <div className="max-w-xs p-1 text-left">
+      <p className="mb-1 text-xs font-medium">
+        Preview only
+      </p>
+      <p className="text-[11px] text-[var(--ink-soft)]">
+        The published image keeps its full orientation.
       </p>
     </div>
   );
@@ -113,11 +111,11 @@ const AddProjectCard = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="w-full mb-6 relative">
         {formData.coverImage ? (
-          <div className="relative h-64 md:h-80 lg:h-96 rounded-lg overflow-hidden group">
+          <div className="group relative h-64 overflow-hidden border border-rule bg-paper-2 md:h-72">
             <Image
               src={formData.coverImage}
               alt="Cover Image Preview"
-              className="rounded-lg object-cover w-full h-full"
+              className="h-full w-full object-cover"
             />
             <Tooltip
               content={tooltipContent}
@@ -131,22 +129,22 @@ const AddProjectCard = ({
                   e.preventDefault();
                   setIsTooltipOpen(!isTooltipOpen);
                 }}
-                className="absolute top-2 right-2 z-50 p-2 bg-emerald-200 rounded-full"
+                className="absolute right-3 top-3 z-30 inline-flex h-8 w-8 items-center justify-center border border-edge bg-paper/90 text-ink transition-colors duration-150 hover:border-ink"
                 aria-label="Image Preview Notice"
               >
-                <Info size={24} color="green" />
+                <Info size={14} />
               </button>
             </Tooltip>
           </div>
         ) : (
-          <div className="h-64 md:h-80 lg:h-96 bg-gray-200 rounded-lg flex items-center justify-center">
-            <p className="text-gray-500 text-lg">No image preview</p>
+          <div className="flex h-64 items-center justify-center border border-dashed border-rule bg-paper-2 md:h-72">
+            <p className="text-sm text-ink-soft">Paste an image URL to preview it here</p>
           </div>
         )}
       </div>
       <div className="space-y-6">
-        <ProjectFormInputs 
-          formData={formData} 
+        <ProjectFormInputs
+          formData={formData}
           handleChange={handleChange}
         />
         <ProjectFormButtons
